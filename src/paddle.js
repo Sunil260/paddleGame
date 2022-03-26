@@ -24,8 +24,6 @@ export default class Paddle {
   }
 
   update(deltaT) {
-    if (!deltaT) return;
-
     this.position.x += this.currV;
 
     if (this.position.x < 0) this.position.x = 0;
