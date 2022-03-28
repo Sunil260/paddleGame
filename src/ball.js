@@ -1,11 +1,13 @@
+import { detectCollison } from "./colisionDetect";
+
 export default class Ball {
-  constructor(gameWidth, gameHeight) {
+  constructor(game) {
     this.image = document.getElementById("ball");
-    this.speed = { x: 4, y: 4 };
-    this.position = { x: 10, y: 10 };
+    this.reset();
     this.size = 16;
-    this.gameWidth = gameWidth;
-    this.gameHeight = gameHeight;
+    this.gameWidth = game.gameWidth;
+    this.gameHeight = game.gameHeight;
+    this.game = game;
   }
 
   draw(ctx) {
@@ -17,13 +19,33 @@ export default class Ball {
       this.size
     );
   }
+
   update(deltaT) {
     this.position.x += this.speed.x;
     this.position.y += this.speed.y;
-    if (this.position.x > this.gameWidth - this.size) {
-      this.position.x = this.gameWidth - this.size;
+
+    //Walls On Screen
+    if (this.position.x > this.gameWidth - this.size || this.position.x < 0) {
+      this.speed.x = -this.speed.x;
     }
-    if (this.position.y > this.gameHeight - this.size)
-      this.position.y = this.gameHeight - this.size;
+
+    if (this.position.y < 0) {
+      this.speed.y = -this.speed.y;
+    }
+
+    if (this.position.y + this.size > this.gameHeight) {
+      this.game.lives -= 1;
+      this.reset();
+    }
+
+    //collide paddle
+    if (detectCollison(this, this.game.paddle)) {
+      this.speed.y = -this.speed.y;
+      this.position.y = this.game.paddle.position.y - this.size;
+    }
+  }
+  reset() {
+    this.speed = { x: 4, y: -2 };
+    this.position = { x: 10, y: 400 };
   }
 }
